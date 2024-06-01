@@ -12,7 +12,9 @@
         "x86_64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      pkgs = forAllSystems (system: import nixpkgs { inherit system; });
+      pkgsAll = forAllSystems (system: import nixpkgs { inherit system; });
+      system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
     in
     with nixpkgs.lib;
     rec {
@@ -32,6 +34,9 @@
           grub2-theme = pkgs.stdenv.mkDerivation {
             name = "grub2-theme";
             src = "${self}";
+            meta = {
+              platforms = systems;
+            };
             installPhase = ''
               mkdir -p $out/grub/themes;
               bash ./install.sh \
@@ -62,6 +67,7 @@
               EOF
               fi;
             '';
+
           };
           resolution = resolutions."${cfg.screen}";
         in
