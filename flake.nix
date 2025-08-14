@@ -19,6 +19,13 @@
         in
         with nixpkgs.lib;
         rec {
+          checks.default = (nixpkgs.lib.nixosSystem {
+            inherit system;
+            modules = [
+              nixosModules.default
+              ./test.nix
+            ];
+          }).config.system.build.toplevel;
           nixosModules.default = { config, ... }:
             let
               cfg = config.boot.loader.grub2-theme;
@@ -183,5 +190,7 @@
         }
       );
     in
-    perSystem;
+    perSystem // {
+      checks = nixpkgs.lib.mapAttrs (system: value: value.checks) perSystem;
+    };
 }
